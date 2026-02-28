@@ -10,13 +10,68 @@ const db = require('./db');
 // Return an instance of an Express application
 const app = express();
 
-app.use(express.json());
+// Import Passport.js for Password Auth
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
 
 // Define Port 
 const PORT = 3000;
 
+app.use(
+    session({
+        secret: 'secret-key',
+        resave: false,
+        saveUninitialized: false
+    })
+);
+
+app.use(express.json());
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Complete the serialization of User
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+// Complete the deserialization of User
+passport.deserializeUser((id, done) => {
+    db.query('SELECT id, email, first_name, last_name FROM users WHERE id = $1', [id]) 
+        .then(result => {
+            if (result.rows.length > 0) {
+                done(null, result.rows[0]);
+            } else {
+                done(new Error('User not found'), null);
+            }
+        })
+        .catch(err => {
+            console.error('Error during deserialization:', err);
+            done(err, null);
+        });
+});
+passport.use(
+    new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+        try {
+            const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+            if (result.rows.length === 0) {
+                return done(null, false, { message: 'Incorrect email.' });
+            }
+            const user = result.rows[0];
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+            return done(null, user);
+        }
+        catch (err) {
+            console.error('Error during authentication:', err);
+            return done(err);
+        }
+    })
+);
+
 // Get Route for Home Page
-app.get('/',(req, res) => {
+app.get('/', (req, res) => {
     res.send('Welcome to the E-Commerce API!');
 });
 
@@ -124,6 +179,15 @@ app.put('/users/:id', async(req, res) => {
         res.status(500).json({message: 'Server error during user update'});
         }
 })
+
+// POST /auth/login - The endpoint to log in
+app.post('/auth/login', passport.authenticate('local'), (req, res) => {
+    // If this function is reached, login was successful!
+    res.json({
+        message: "Login successful",
+        user: req.user // Passport populates req.user after successful login
+    });
+});
 
 // App listen
 app.listen(PORT, () => {
