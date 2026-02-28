@@ -82,6 +82,48 @@ app.post('/register', async (req, res) => {
     }
 });
 
+// Retrieve Specific User
+app.get('/users/:id', async(req, res) => {
+    const {id} = req.params;
+    try{
+        const user = await db.query('SELECT id, email, first_name, last_name FROM users WHERE id = $1', [id]);
+        if (user.rows.length === 0) {
+            return res.status(404).json({message: "User not found"});
+        }
+        res.json(user.rows[0]);
+    } catch(err) {
+        console.error("Retrevial of User Information Not Found", err);
+        res.status(500).json({message:'Server error'})
+    }
+});
+
+// Update User 
+app.put('/users/:id', async(req, res) => {
+    const {id} = req.params;
+    const {email, first_name, last_name} = req.body;
+
+    try {
+        // Check if user exists
+        const userCheck = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+        if (userCheck.rows.length === 0) {
+            return res.status(404).json({message: "User not found"});
+        }
+        
+        // Update the user
+        const updatedUser = await db.query(
+            'UPDATE users SET email = $1, first_name = $2, last_name = $3 WHERE id = $4 RETURNING id, email, first_name, last_name',
+            [email, first_name, last_name, id]
+        );
+        res.json({
+            message: 'User updated successfully',
+            user: updatedUser.rows[0]
+        });
+    }
+        catch(err) {
+        console.error("User Update Failed", err);
+        res.status(500).json({message: 'Server error during user update'});
+        }
+})
 
 // App listen
 app.listen(PORT, () => {
