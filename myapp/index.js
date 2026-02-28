@@ -90,15 +90,15 @@ app.get('/db-test', async(req, res) => {
 });
 
 // Test another API endpoint
-app.get('/products', async(req, res) => {
-    try {
-        const products = await db.query("SELECT * FROM products");
-        res.json(products.rows)
-    } catch(err) {
-        console.error(err);
-        res.status(500).send("Server Error")
-    }
-});
+// app.get('/products', async(req, res) => {
+//     try {
+//         const products = await db.query("SELECT * FROM products");
+//         res.json(products.rows)
+//     } catch(err) {
+//         console.error(err);
+//         res.status(500).send("Server Error")
+//     }
+// });
 
 // New User Registration POST /register 
 app.post('/register', async (req, res) => {
@@ -188,6 +188,115 @@ app.post('/auth/login', passport.authenticate('local'), (req, res) => {
         user: req.user // Passport populates req.user after successful login
     });
 });
+
+// Get all products OR filter by category
+app.get('/products', async (req, res) => {
+    const { category } = req.query; 
+
+    try {
+        let result;
+        if (category) {
+            result = await db.query('SELECT * FROM products WHERE category = $1', [category]);
+        } else {
+            result = await db.query('SELECT * FROM products');
+        }
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).json({message: 'Server error'});
+    }
+});
+
+// Get specific product route
+app.get('/products/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        const product = await db.query('SELECT * FROM products WHERE id = $1', [id]);
+        if (product.rows.length === 0) {
+            return res.status(404).json({message: "Product not found"});
+        }
+        res.json(product.rows[0]);
+    }
+    catch (err) {
+        console.error('Error fetching product:', err);
+        res.status(500).json({message: 'Server error while fetching product'});
+    }
+}
+);
+
+// Post new product
+app.post('/products', async (req, res) => {
+    const {name, description, price, category} = req.body;
+    
+    // Validation Logic 
+    if (!name || !price) {
+        return res.status(400).json({message:"Name and price are required"});
+    }
+    
+    try {
+        const newProduct = await db.query(
+            'INSERT INTO products (name, description, price, category) VALUES ($1, $2, $3, $4) RETURNING *',
+            [name, description, price, category]
+        );
+        res.status(201).json({
+            message: 'Product created successfully',
+            product: newProduct.rows[0]
+        });
+    }
+    catch (err) {
+        console.error('Error creating product:', err);
+        res.status(500).json({message: 'Server error during product creation'});
+    }
+}
+);
+
+// Update product
+app.put('/products/:id', async (req, res) => {
+    const {id} = req.params;
+    const {name, description, price, category} = req.body;
+    
+    try {
+        // Check if product exists
+        const productCheck = await db.query('SELECT * FROM products WHERE id = $1', [id]);  
+        if (productCheck.rows.length === 0) {
+            return res.status(404).json({message: "Product not found"});
+        }
+        const updatedProduct = await db.query(
+            'UPDATE products SET name = $1, description = $2, price = $3, category = $4 WHERE id = $5 RETURNING *',
+            [name, description, price, category, id]
+        );
+        res.json({
+            message: 'Product updated successfully',
+            product: updatedProduct.rows[0]
+        });
+    }
+    catch (err) {
+        console.error('Error updating product:', err);
+        res.status(500).json({message: 'Server error during product update'});
+    }
+}
+);
+
+// Delete Product
+app.delete('/products/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        // Check if product exists
+        const productCheck = await db.query('SELECT * FROM products WHERE id = $1', [id]);
+        if (productCheck.rows.length === 0) {
+            return res.status(404).json({message: "Product not found"});
+        }
+        await db.query('DELETE FROM products WHERE id = $1', [id]);
+        res.json({message: "Product deleted successfully"});
+    }
+    catch (err) {
+        console.error('Error deleting product:', err);
+        res.status(500).json({message: 'Server error during product deletion'});
+    }
+}
+);
+
+
 
 // App listen
 app.listen(PORT, () => {
