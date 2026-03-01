@@ -1,3 +1,6 @@
+// Load environment variables
+require('dotenv').config();
+
 // Import Express Library 
 const express = require('express');
 
@@ -6,6 +9,12 @@ const bcrypt = require('bcrypt');
 
 // Import database
 const db = require('./db');
+
+// Import security middleware
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
 
 // Return an instance of an Express application
 const app = express();
@@ -18,11 +27,32 @@ const session = require("express-session");
 // Define Port 
 const PORT = 3000;
 
+// Security middleware
+app.use(helmet()); // Adds security headers
+app.use(cors({
+    origin: 'http://localhost:3000', // Update with your frontend URL
+    credentials: true // Allow cookies
+}));
+
+// Rate limiting for authentication endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 requests per windowMs
+    message: 'Too many login attempts, try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 app.use(
     session({
-        secret: 'secret-key',
+        secret: process.env.SESSION_SECRET || 'fallback-secret-key', // Use env variable
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        cookie: {
+            secure: false, // Set to true in production with HTTPS
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        }
     })
 );
 
@@ -108,16 +138,25 @@ app.get('/db-test', async(req, res) => {
 // });
 
 // New User Registration POST /register 
-app.post('/register', async (req, res) => {
-    console.log('Register route accessed with data:', req.body);
-    const {email, password, first_name, last_name} = req.body;
-    
-    // Validation Logic 
-    if (!email || !password) {
-        return res.status(400).json({message:"Email and password are required"});
-    }
+app.post('/register', 
+    [
+        body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+        body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+        body('first_name').trim().isLength({ min: 1 }).withMessage('First name required'),
+        body('last_name').trim().isLength({ min: 1 }).withMessage('Last name required')
+    ],
+    async (req, res) => {
+        console.log('Register route accessed with data:', req.body);
+        
+        // Check validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        
+        const {email, password, first_name, last_name} = req.body;
 
-    try {
+        try {
         // Check if user already exists
         const userCheck = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         if (userCheck.rows.length > 0) {
@@ -189,13 +228,27 @@ app.put('/users/:id', async(req, res) => {
 })
 
 // POST /auth/login - The endpoint to log in
-app.post('/auth/login', passport.authenticate('local'), (req, res) => {
-    // If this function is reached, login was successful!
-    res.json({
-        message: "Login successful",
-        user: req.user // Passport populates req.user after successful login
-    });
-});
+app.post('/auth/login', 
+    authLimiter, // Apply rate limiting
+    [
+        body('email').isEmail().normalizeEmail(),
+        body('password').isLength({ min: 6 })
+    ],
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        passport.authenticate('local')(req, res, next);
+    },
+    (req, res) => {
+        // If this function is reached, login was successful!
+        res.json({
+            message: "Login successful",
+            user: req.user // Passport populates req.user after successful login
+        });
+    }
+);
 
 // Get all products OR filter by category
 app.get('/products', async (req, res) => {
@@ -233,13 +286,21 @@ app.get('/products/:id', async (req, res) => {
 );
 
 // Post new product
-app.post('/products', async (req, res) => {
-    const {name, description, price, category} = req.body;
-    
-    // Validation Logic 
-    if (!name || !price) {
-        return res.status(400).json({message:"Name and price are required"});
-    }
+app.post('/products', 
+    [
+        body('name').trim().isLength({ min: 1 }).withMessage('Product name required'),
+        body('price').isNumeric().withMessage('Price must be a number'),
+        body('description').optional().trim(),
+        body('category').optional().trim()
+    ],
+    async (req, res) => {
+        // Check validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        
+        const {name, description, price, category} = req.body;
     
     try {
         const newProduct = await db.query(
@@ -333,9 +394,21 @@ app.post('/cart', isAuthenticated, async(req, res) => {
 });
 
 // Post CardId - Add product to a specific cartId
-app.post('/cart/:cartId/items', isAuthenticated, async(req, res) => {
-    const {cartId} = req.params;
-    const {productId, qty} = req.body;
+app.post('/cart/:cartId/items', 
+    isAuthenticated,
+    [
+        body('productId').isInt({ min: 1 }).withMessage('Valid product ID required'),
+        body('qty').isInt({ min: 1 }).withMessage('Quantity must be at least 1')
+    ],
+    async(req, res) => {
+        // Check validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        
+        const {cartId} = req.params;
+        const {productId, qty} = req.body;
     try {
         const cartCheck = await db.query('SELECT * FROM cart WHERE id = $1', [cartId]);
         if (cartCheck.rows.length === 0) {
