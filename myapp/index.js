@@ -30,6 +30,12 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Add request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // Complete the serialization of User
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -72,6 +78,7 @@ passport.use(
 
 // Get Route for Home Page
 app.get('/', (req, res) => {
+    console.log('Home route accessed');
     res.send('Welcome to the E-Commerce API!');
 });
 
@@ -102,6 +109,7 @@ app.get('/db-test', async(req, res) => {
 
 // New User Registration POST /register 
 app.post('/register', async (req, res) => {
+    console.log('Register route accessed with data:', req.body);
     const {email, password, first_name, last_name} = req.body;
     
     // Validation Logic 
@@ -296,6 +304,240 @@ app.delete('/products/:id', async (req, res) => {
 }
 );
 
+// Authentication middleware
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.status(401).json({message: 'Authentication required'});
+}
+
+// Post Cart - Create new cart for user 
+app.post('/cart', isAuthenticated, async(req, res) => {
+    const userId = req.user.id;
+    try {
+        // --- UPDATED QUERY ---
+        const newCart = await db.query(
+            'INSERT INTO cart ("userid") VALUES ($1) RETURNING *',
+            [userId]
+        );
+        // ---------------------
+        res.status(201).json({
+            message: 'Cart created successfully',
+            cart: newCart.rows[0]
+        });
+    } catch (err) {
+        console.error('Error creating cart:', err);
+        res.status(500).json({message: 'Server error during cart creation'});
+    }
+});
+
+// Post CardId - Add product to a specific cartId
+app.post('/cart/:cartId/items', isAuthenticated, async(req, res) => {
+    const {cartId} = req.params;
+    const {productId, qty} = req.body;
+    try {
+        const cartCheck = await db.query('SELECT * FROM cart WHERE id = $1', [cartId]);
+        if (cartCheck.rows.length === 0) {
+            return res.status(404).json({message: "Cart not found"});
+        }
+        
+        // --- UPDATED QUERY ---
+        const addedItem = await db.query(
+            'INSERT INTO cart_items ("cartid", "productid", qty) VALUES ($1, $2, $3) RETURNING *',
+            [cartId, productId, qty]
+        );
+        // ---------------------
+        
+        res.status(201).json({
+            message: 'Product added to cart successfully',
+            cartItem: addedItem.rows[0]
+        });
+    } catch (err) {
+        console.error('Error adding product to cart:', err);
+        res.status(500).json({message: 'Server error during adding product to cart'});
+    }
+});
+
+// GET /cart/:cartId - Retrieve items in a specific cart
+app.get('/cart/:cartId', isAuthenticated, async (req, res) => {
+    const { cartId } = req.params;
+
+    try {
+        // 1. Join tables to get product details for the cart items
+        const result = await db.query(
+            `SELECT 
+                ci.id AS cart_item_id,
+                p.name AS product_name,
+                p.price,
+                ci.qty
+             FROM cart_items ci
+             JOIN products p ON ci."productid" = p.id
+             WHERE ci."cartid" = $1`,
+            [cartId]
+        );
+
+        // 2. Check if the cart exists or is empty
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Cart not found or is empty" });
+        }
+
+        // 3. Send back the items
+        res.json({
+            cartId: cartId,
+            items: result.rows
+        });
+    } catch (err) {
+        console.error('Error fetching cart:', err);
+        res.status(500).json({ message: 'Server error while fetching cart' });
+    }
+});
+
+// Delete Product from Cart 
+app.delete('/cart/:cartId/items/:itemId', isAuthenticated, async (req, res) => {
+    const { cartId, itemId } = req.params;
+    const userId = req.user.id; // Get logged in user's ID
+
+    // --- ADD THIS LOG ---
+    console.log(`Attempting to delete Item ${itemId} from Cart ${cartId} by User ${userId}`);
+    // --------------------
+    
+    try {
+        // 1. Check if the cart belongs to the user, and if the item is in it
+        // Note: Using "cartid" as you verified.
+        const itemCheck = await db.query(
+            `SELECT ci.id 
+             FROM cart_items ci
+             JOIN cart c ON ci.cartid = c.id
+             WHERE ci.id = $1 AND ci.cartid = $2 AND c.userid = $3`,
+            [itemId, cartId, userId]
+        );
+
+        // --- ADD THIS LOG ---
+        console.log('Query result:', itemCheck.rows);
+        // --------------------
+
+        if (itemCheck.rows.length === 0) {
+            return res.status(404).json({ message: "Cart item not found or does not belong to you" });
+        }
+        
+        // 2. Delete the cart item
+        await db.query('DELETE FROM cart_items WHERE id = $1', [itemId]);
+        res.json({ message: "Cart item deleted successfully" });
+    }
+    catch (err) {
+        console.error('Error deleting cart item:', err);
+        res.status(500).json({ message: 'Server error during cart item deletion' });
+    }
+});
+
+// POST /cart/:cartId/checkout - Final Checkout Endpoint
+app.post('/cart/:cartId/checkout', isAuthenticated, async (req, res) => {
+    const userId = req.user.id;
+    const { cartId } = req.params; // CartId comes from URL params now
+
+    try {
+        // 1. Fetch cart items and verify ownership
+        const cartItems = await db.query(
+            `SELECT ci.qty, p.price, ci.productid, p.name, p.description
+                FROM cart_items ci
+                JOIN cart c ON ci.cartid = c.id
+                JOIN products p ON ci.productid = p.id
+                WHERE c.id = $1 AND c.userid = $2`,
+            [cartId, userId]
+        );
+
+        if (cartItems.rows.length === 0) {
+            return res.status(404).json({ message: "Cart not found, empty, or does not belong to you" });
+        }
+
+        // 2. Calculate total price
+        const totalPrice = cartItems.rows.reduce((total, item) => total + item.qty * item.price, 0);
+
+        // 3. Create new order
+        const newOrder = await db.query(
+            'INSERT INTO orders (userid, total, status) VALUES ($1, $2, $3) RETURNING *',
+            [userId, totalPrice, 'pending']
+        );
+        const orderId = newOrder.rows[0].id;
+
+        // 4. Insert order items
+        for (const item of cartItems.rows) {
+            await db.query(
+                'INSERT INTO order_items (orderid, productid, qty, price, name, description) VALUES ($1, $2, $3, $4, $5, $6)',
+                [orderId, item.productid, item.qty, item.price, item.name, item.description]
+            );
+        }
+
+        // 5. Clear the cart
+        await db.query('DELETE FROM cart_items WHERE cartid = $1', [cartId]);
+
+        res.status(201).json({
+            message: 'Order created successfully',
+            order: newOrder.rows[0]
+        });
+    }
+    catch (err) {
+        console.error('Error during checkout:', err);
+        res.status(500).json({ message: 'Server error during checkout' });
+    }
+});
+
+// Get All Orders
+app.get('/orders', isAuthenticated, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const orders = await db.query('SELECT * FROM orders WHERE userid = $1', [userId]);
+        res.json(orders.rows);
+    }
+    catch (err) {
+        console.error('Error fetching orders:', err);
+        res.status(500).json({message: 'Server error while fetching orders'});
+    }
+}
+);
+
+// Get Specific Order by Id with Items - DEBUGGING VERSION
+app.get('/orders/:id', isAuthenticated, async (req, res) => {
+    const userId = req.user.id;
+    const {id} = req.params;
+    
+    console.log(`Debug: Fetching Order ID ${id} for User ${userId}`);
+    
+    try {
+        const orderResult = await db.query(
+            'SELECT * FROM orders WHERE id = $1 AND userid = $2',
+            [id, userId]
+        );
+
+        if (orderResult.rows.length === 0) {
+            console.log(`Debug: Order ${id} not found or unauthorized`);
+            return res.status(404).json({message: "Order not found or does not belong to you"});
+        }
+
+        // --- DEBUGGING LOG ---
+        console.log(`Debug: Order found. Fetching items for orderid: ${id}`);
+        // ---------------------
+
+        const itemsResult = await db.query(
+            'SELECT * FROM order_items WHERE orderid = $1',
+            [id]
+        );
+        
+        // --- DEBUGGING LOG ---
+        console.log(`Debug: Found ${itemsResult.rows.length} items`);
+        // ---------------------
+
+        const order = orderResult.rows[0];
+        order.items = itemsResult.rows;
+
+        res.json(order);
+    }
+    catch (err) {
+        console.error('Error fetching order:', err);
+        res.status(500).json({message: 'Server error while fetching order'});
+    }
+});
 
 
 // App listen
