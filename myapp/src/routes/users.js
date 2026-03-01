@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-// TODO: Implement user routes
-// GET /users/:id - Get user by ID
-// PUT /users/:id - Update user
-// DELETE /users/:id - Delete user
+const { validateId } = require('../middleware/validation');
+const { isAuthenticated } = require('../middleware/auth');
+const userController = require('../controllers/userController');
 
-router.get('/:id', (req, res) => {
-    res.json({ message: 'User routes - Coming soon!' });
-});
+// GET /users/:id - Get user by ID
+router.get('/:id', validateId, userController.getUserById);
+
+// PUT /users/:id - Update user
+router.put('/:id', validateId, isAuthenticated, userController.updateUser);
+
+// DELETE /users/:id - Delete user (admin only - be careful!)
+router.delete('/:id', validateId, isAuthenticated, userController.deleteUser);
 
 module.exports = router;

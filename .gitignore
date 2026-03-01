@@ -1,2 +1,5 @@
 node_modules/
 .env
+
+# Old monolithic file (kept for reference)
+myapp/index.js

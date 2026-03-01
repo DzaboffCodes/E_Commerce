@@ -1,13 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-// TODO: Implement order routes
-// GET /orders - Get all orders for user
-// GET /orders/:id - Get specific order
-// POST /orders - Create order (from cart checkout)
+const { validateId } = require('../middleware/validation');
+const { isAuthenticated, requireAdmin } = require('../middleware/auth');
+const orderController = require('../controllers/orderController');
 
-router.get('/', (req, res) => {
-    res.json({ message: 'Order routes - Coming soon!' });
-});
+// GET /orders - Get all orders for authenticated user
+router.get('/', isAuthenticated, orderController.getAllOrders);
+
+// GET /orders/:id - Get specific order by ID
+router.get('/:id', isAuthenticated, validateId, orderController.getOrderById);
+
+// PUT /orders/:id/status - Update order status (admin only)
+router.put('/:id/status', isAuthenticated, validateId, orderController.updateOrderStatus);
+
+// POST /orders/:id/cancel - Cancel order (user can cancel their own)
+router.post('/:id/cancel', isAuthenticated, validateId, orderController.cancelOrder);
 
 module.exports = router;

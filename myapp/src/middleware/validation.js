@@ -93,6 +93,13 @@ const validateCartId = [
     handleValidationErrors
 ];
 
+const validateItemId = [
+    param('itemId')
+        .isInt({ min: 1 })
+        .withMessage('Valid item ID required'),
+    handleValidationErrors
+];
+
 module.exports = {
     validateRegistration,
     validateLogin,
@@ -100,5 +107,6 @@ module.exports = {
     validateCartItem,
     validateId,
     validateCartId,
+    validateItemId,
     handleValidationErrors
 };
