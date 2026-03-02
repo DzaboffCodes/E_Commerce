@@ -1,0 +1,45 @@
+[dotenv@17.3.1] injecting env (6) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+Registering base route at /
+Registering health route at /health
+Setting up Swagger at /docs...
+Swagger setup complete
+🚀 Server is running on port 3000
+📍 API Base URL: http://localhost:3000
+2026-03-02T12:05:57.233Z - GET /health - IP: ::1
+Incoming request: GET /health
+Health route hit
+2026-03-02T12:05:57.233Z - GET /health - 200 - 36ms
+2026-03-02T12:06:00.860Z - GET /docs/ - IP: ::1
+Incoming request: GET /docs/
+2026-03-02T12:06:00.860Z - GET /docs/ - 304 - 2ms
+2026-03-02T12:06:00.935Z - GET /docs/swagger-ui.css - IP: ::1
+Incoming request: GET /docs/swagger-ui.css
+2026-03-02T12:06:00.935Z - GET /docs/swagger-ui.css - 304 - 1ms
+2026-03-02T12:06:00.939Z - GET /docs/swagger-ui-bundle.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-bundle.js
+2026-03-02T12:06:00.939Z - GET /docs/swagger-ui-standalone-preset.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-standalone-preset.js
+2026-03-02T12:06:00.939Z - GET /docs/swagger-ui-bundle.js - 304 - 1ms
+2026-03-02T12:06:00.939Z - GET /docs/swagger-ui-standalone-preset.js - 304 - 0ms
+2026-03-02T12:06:00.941Z - GET /docs/swagger-ui-init.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-init.js
+2026-03-02T12:06:00.941Z - GET /docs/swagger-ui-init.js - 304 - 1ms
+2026-03-02T12:06:04.233Z - GET /health - IP: ::1
+Incoming request: GET /health
+Health route hit
+2026-03-02T12:06:04.233Z - GET /health - 200 - 2ms
+2026-03-02T12:06:11.757Z - GET /docs/ - IP: ::1
+Incoming request: GET /docs/
+2026-03-02T12:06:11.757Z - GET /docs/ - 304 - 2ms
+2026-03-02T12:06:11.765Z - GET /docs/swagger-ui.css - IP: ::1
+Incoming request: GET /docs/swagger-ui.css
+2026-03-02T12:06:11.765Z - GET /docs/swagger-ui.css - 304 - 2ms
+2026-03-02T12:06:11.768Z - GET /docs/swagger-ui-bundle.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-bundle.js
+2026-03-02T12:06:11.769Z - GET /docs/swagger-ui-standalone-preset.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-standalone-preset.js
+2026-03-02T12:06:11.768Z - GET /docs/swagger-ui-bundle.js - 304 - 1ms
+2026-03-02T12:06:11.769Z - GET /docs/swagger-ui-standalone-preset.js - 304 - 1ms
+2026-03-02T12:06:11.770Z - GET /docs/swagger-ui-init.js - IP: ::1
+Incoming request: GET /docs/swagger-ui-init.js
+2026-03-02T12:06:11.770Z - GET /docs/swagger-ui-init.js - 304 - 1ms

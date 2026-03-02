@@ -8,6 +8,9 @@ const session = require('express-session');
 // Import configurations
 require('./src/config/passport');
 
+// Import Swagger documentation
+const { swaggerUi, specs } = require('./src/config/swagger');
+
 // Import middleware
 const { setupSecurity } = require('./src/middleware/security');
 const { requestLogger } = require('./src/utils/logger');
@@ -50,8 +53,16 @@ app.use(passport.session());
 // Request logging
 app.use(requestLogger);
 
+// Add debug middleware to see all requests
+app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.path}`);
+    next();
+});
+
 // Health check endpoint
+console.log('Registering base route at /');
 app.get('/', (req, res) => {
+    console.log('Base route hit');
     res.json({
         message: 'Welcome to the E-Commerce API!',
         status: 'healthy',
@@ -60,15 +71,85 @@ app.get('/', (req, res) => {
 });
 
 // Database connection test
+console.log('Registering health route at /health');
 app.get('/health', async (req, res) => {
+    console.log('Health route hit');
     try {
         const db = require('./src/config/database');
         await db.query('SELECT 1');
         res.json({ status: 'healthy', database: 'connected' });
     } catch (err) {
+        console.error('Health check error:', err);
         res.status(500).json({ status: 'unhealthy', database: 'disconnected' });
     }
 });
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API Welcome Message
+ *     description: Returns a welcome message and API status
+ *     tags: [General]
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Welcome to the E-Commerce API!"
+ *                 status:
+ *                   type: string
+ *                   example: "healthy"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ */
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health Check
+ *     description: Check the health status of the API and database connection
+ *     tags: [General]
+ *     responses:
+ *       200:
+ *         description: API and database are healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "healthy"
+ *                 database:
+ *                   type: string
+ *                   example: "connected"
+ *       500:
+ *         description: Database connection failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "unhealthy"
+ *                 database:
+ *                   type: string
+ *                   example: "disconnected"
+ */
+
+// Swagger Documentation
+console.log('Setting up Swagger at /docs...');
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
+console.log('Swagger setup complete');
 
 // Mount routes
 app.use('/auth', authRoutes);
@@ -86,7 +167,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
+// 404 handler for all unmatched routes
 app.use((req, res) => {
     res.status(404).json({
         message: 'Resource not found',
