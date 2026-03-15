@@ -43,3 +43,45 @@ Incoming request: GET /docs/swagger-ui-standalone-preset.js
 2026-03-02T12:06:11.770Z - GET /docs/swagger-ui-init.js - IP: ::1
 Incoming request: GET /docs/swagger-ui-init.js
 2026-03-02T12:06:11.770Z - GET /docs/swagger-ui-init.js - 304 - 1ms
+2026-03-02T14:39:26.649Z - POST /auth/login - IP: ::1
+Incoming request: POST /auth/login
+2026-03-02T14:39:26.649Z - POST /auth/login - 200 - 111ms
+2026-03-02T14:40:21.767Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:40:21.767Z - POST /orders - 404 - 2ms
+2026-03-02T14:40:42.162Z - GET /cart/1 - IP: ::1
+Incoming request: GET /cart/1
+2026-03-02T14:40:42.162Z - GET /cart/1 - 200 - 6ms
+2026-03-02T14:40:57.480Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:40:57.480Z - POST /orders - 404 - 1ms
+2026-03-02T14:41:02.507Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:41:02.507Z - POST /orders - 404 - 1ms
+2026-03-02T14:41:06.182Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:41:06.182Z - POST /orders - 404 - 1ms
+2026-03-02T14:41:10.208Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:41:10.208Z - POST /orders - 404 - 1ms
+2026-03-02T14:41:15.796Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:41:15.796Z - POST /orders - 404 - 0ms
+2026-03-02T14:41:26.285Z - POST /cart - IP: ::1
+Incoming request: POST /cart
+2026-03-02T14:41:26.285Z - POST /cart - 201 - 11ms
+2026-03-02T14:41:35.228Z - POST /cart/1/items - IP: ::1
+Incoming request: POST /cart/1/items
+2026-03-02T14:41:35.228Z - POST /cart/1/items - 201 - 5ms
+2026-03-02T14:41:41.682Z - GET /cart/1 - IP: ::1
+Incoming request: GET /cart/1
+2026-03-02T14:41:41.682Z - GET /cart/1 - 200 - 2ms
+2026-03-02T14:41:50.795Z - POST /orders - IP: ::1
+Incoming request: POST /orders
+2026-03-02T14:41:50.795Z - POST /orders - 404 - 1ms
+2026-03-02T14:42:16.692Z - POST /cart/1/checkout - IP: ::1
+Incoming request: POST /cart/1/checkout
+2026-03-02T14:42:16.692Z - POST /cart/1/checkout - 401 - 0ms
+2026-03-02T14:42:31.264Z - POST /cart/1/checkout - IP: ::1
+Incoming request: POST /cart/1/checkout
+2026-03-02T14:42:31.264Z - POST /cart/1/checkout - 201 - 9ms
