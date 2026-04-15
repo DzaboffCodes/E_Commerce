@@ -3,6 +3,7 @@ import "./App.css";
 
 // Import component pages
 import Header from './components/common/Header';
+import Footer from './components/common/Footer';
 import HomePage from './components/home';
 import ProductsPage from './components/products';
 import NotFoundPage from './components/not_found';
@@ -13,7 +14,6 @@ function App() {
     <>
       <Header />
 
-
       {/* Routes matches current URL and chooses which page component to render */}
       <Routes>
         <Route path='/' element={<HomePage />} />
@@ -21,6 +21,8 @@ function App() {
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
+
+      <Footer />
     </>
   );
 }
