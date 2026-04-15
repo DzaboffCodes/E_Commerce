@@ -53,7 +53,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-// Delete user (optional - be careful with this in production)
+// Delete user 
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;

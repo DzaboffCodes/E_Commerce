@@ -15,7 +15,7 @@ const register = async (req, res) => {
         }
 
         // Hash password
-        const saltRounds = 12; // Increased from 10 for better security
+        const saltRounds = 12;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Insert new user
