@@ -4,6 +4,7 @@ import "./App.css";
 // Import component pages
 import HomePage from './components/home';
 import ProductsPage from './components/products';
+import NotFoundPage from './components/not_found';
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/products' element={<ProductsPage />} />
+        {/* Catch all route for bad URLs */}
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
     </>
   );
