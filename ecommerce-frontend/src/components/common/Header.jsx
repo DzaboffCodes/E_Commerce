@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 function Header() {
     return (
         <header>
-            <h1>HAUL</h1>
+            <h1 className='brand'>HAUL</h1>
             
             {/* Link changes URL without full page refresh */}
             <nav>

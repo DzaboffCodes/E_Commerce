@@ -313,3 +313,12 @@ header nav a[aria-current="page"] {
     font-size: 0.96rem;
   }
 }
+
+header .brand {
+margin: 0;
+font-size: 2rem;
+letter-spacing: 0.14em;
+font-weight: 700;
+color: #1f5fa6;
+line-height: 1;
+}
