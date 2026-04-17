@@ -5,11 +5,15 @@ import {Link} from "react-router-dom";
 function Header() {
     return (
         <header>
-            <h1>E-Commerce Frontend</h1>
+            <h1>HAUL</h1>
             
             {/* Link changes URL without full page refresh */}
             <nav>
-                <Link to="/">Home</Link> | <Link to="/products">Products</Link>
+                <ul>
+                    <Link to="/">Home</Link> 
+                    <Link to="/products">Products</Link>
+                    <Link to='/register'>Register</Link>
+                </ul>
             </nav>
         </header>
     )

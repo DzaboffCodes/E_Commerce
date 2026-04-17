@@ -4,9 +4,10 @@ import "./App.css";
 // Import component pages
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
-import HomePage from './components/home';
-import ProductsPage from './components/products';
-import NotFoundPage from './components/not_found';
+import HomePage from './components/Home';
+import ProductsPage from './components/Products';
+import NotFoundPage from './components/Not_found';
+import RegisterPage from './components/Register';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/products' element={<ProductsPage />} />
+        <Route path='/register' element={<RegisterPage />}/>
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
