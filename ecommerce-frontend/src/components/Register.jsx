@@ -10,6 +10,39 @@ function RegisterPage() {
     confirmPassword: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+    function validate(values) {
+    const nextErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    const first = values.first_name.trim();
+    const last = values.last_name.trim();
+    const email = values.email.trim();
+
+    if (!first) nextErrors.first_name = "First name is required.";
+    else if (first.length > 50) nextErrors.first_name = "First name must be 50 characters or fewer.";
+
+    if (!last) nextErrors.last_name = "Last name is required.";
+    else if (last.length > 50) nextErrors.last_name = "Last name must be 50 characters or fewer.";
+
+    if (!email) nextErrors.email = "Email is required.";
+    else if (!emailRegex.test(email)) nextErrors.email = "Please enter a valid email address.";
+
+    if (!values.password) nextErrors.password = "Password is required.";
+    else if (!strongPasswordRegex.test(values.password)) {
+        nextErrors.password = "Use 8+ chars with uppercase, lowercase, and a number.";
+    }
+
+    if (!values.confirmPassword) nextErrors.confirmPassword = "Please confirm your password.";
+    else if (values.confirmPassword !== values.password) {
+        nextErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    return nextErrors;
+  }
+
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -17,6 +50,12 @@ function RegisterPage() {
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) return;
+
     console.log("Register form:", form);
   };
 
@@ -65,6 +104,7 @@ function RegisterPage() {
                   onChange={onChange}
                   placeholder="First name"
                 />
+                {errors.first_name && <span className='field-error'>{errors.first_name}</span>}
               </label>
 
               <label>
@@ -75,6 +115,7 @@ function RegisterPage() {
                   onChange={onChange}
                   placeholder="Last name"
                 />
+                {errors.last_name && <span className='field-error'>{errors.last_name}</span>}
               </label>
             </div>
 
@@ -87,6 +128,7 @@ function RegisterPage() {
                 onChange={onChange}
                 placeholder="you@email.com"
               />
+            {errors.email && <span className='field-error'>{errors.email}</span>}
             </label>
 
             <label>
@@ -98,6 +140,7 @@ function RegisterPage() {
                 onChange={onChange}
                 placeholder="Create a password"
               />
+            {errors.password && <span className='field-error'>{errors.password}</span>}
             </label>
 
             <label>
@@ -109,6 +152,7 @@ function RegisterPage() {
                 onChange={onChange}
                 placeholder="Confirm your password"
               />
+            {errors.confirmPassword && <span className='field-error'>{errors.confirmPassword}</span>}
             </label>
 
             <button type="submit" className="create-btn">
