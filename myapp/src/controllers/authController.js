@@ -20,7 +20,7 @@ const register = async (req, res) => {
 
         // Insert new user
         const newUser = await db.query(
-            'INSERT INTO users (email, password, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id, email, first_name, last_name, created_at',
+            'INSERT INTO users (email, password, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id, email, first_name, last_name',
             [email, hashedPassword, first_name, last_name]
         );
 
