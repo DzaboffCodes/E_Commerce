@@ -131,6 +131,10 @@ return (
                         />
                         {errors.password && <span>{errors.password}</span>}
                     </label>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Logging In" : "Login"}
+                    </button>
                 </form>
             </section>
         </section>
