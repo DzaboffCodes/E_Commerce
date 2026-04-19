@@ -8,6 +8,7 @@ import HomePage from './components/Home';
 import ProductsPage from './components/Products';
 import NotFoundPage from './components/Not_found';
 import RegisterPage from './components/Register';
+import LoginPage from './components/Login';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/products' element={<ProductsPage />} />
         <Route path='/register' element={<RegisterPage />}/>
+        <Route path='/login' element={<LoginPage />}/>
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
