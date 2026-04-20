@@ -88,8 +88,8 @@ const updateProduct = async (req, res) => {
         }
 
         const result = await db.query(
-            'UPDATE products SET name = $1, description = $2, price = $3, category = $4, stock_quantity = $5, image_url = $6 WHERE id = $5 RETURNING *',
-            [name, description, price, category, stock_quantity, image_url]
+            'UPDATE products SET name = $1, description = $2, price = $3, category = $4, stock_quantity = $5, image_url = $6 WHERE id = id RETURNING *',
+            [name, description, price, category, stock_quantity, image_url, id]
         );
 
         successResponse(res, {

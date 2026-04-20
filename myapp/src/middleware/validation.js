@@ -67,11 +67,12 @@ const validateProduct = [
     body('stock_quantity') 
         .optional()
         .trim()
+        .isInt({min: 0})
         .withMessage('Stock quantity must be a non-negative integer'),
     body('image_url')
         .optional()
         .trim()
-        .isURL({protocols: ['http', 'https'], required_protocol: true})
+        .isURL({protocols: ['http', 'https'], require_protocol: true})
         .withMessage('Image URL must be a valid http/https URL'),
     handleValidationErrors
 ];
