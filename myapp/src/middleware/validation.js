@@ -64,6 +64,15 @@ const validateProduct = [
         .trim()
         .isLength({ max: 50 })
         .withMessage('Category cannot exceed 50 characters'),
+    body('stock_quantity') 
+        .optional()
+        .trim()
+        .withMessage('Stock quantity must be a non-negative integer'),
+    body('image_url')
+        .optional()
+        .trim()
+        .isURL({protocols: ['http', 'https'], required_protocol: true})
+        .withMessage('Image URL must be a valid http/https URL'),
     handleValidationErrors
 ];
 

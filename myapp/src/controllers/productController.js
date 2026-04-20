@@ -14,7 +14,7 @@ const getAllProducts = async (req, res) => {
             params.push(category);
         }
 
-        query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
+        query += ' ORDER BY id ASC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
         params.push(parseInt(limit), parseInt(offset));
 
         const result = await db.query(query, params);
@@ -58,11 +58,11 @@ const getProductById = async (req, res) => {
 // Create new product
 const createProduct = async (req, res) => {
     try {
-        const { name, description, price, category } = req.body;
+        const { name, description, price, category, stock_quantity, image_url } = req.body;
 
         const result = await db.query(
-            'INSERT INTO products (name, description, price, category) VALUES ($1, $2, $3, $4) RETURNING *',
-            [name, description, price, category]
+            'INSERT INTO products (name, description, price, category, stock_quantity, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [name, description, price, category, stock_quantity, image_url]
         );
 
         successResponse(res, {
@@ -79,7 +79,7 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category } = req.body;
+        const { name, description, price, category, stock_quantity, image_url } = req.body;
 
         // Check if product exists
         const existingProduct = await db.query('SELECT id FROM products WHERE id = $1', [id]);
@@ -88,8 +88,8 @@ const updateProduct = async (req, res) => {
         }
 
         const result = await db.query(
-            'UPDATE products SET name = $1, description = $2, price = $3, category = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
-            [name, description, price, category, id]
+            'UPDATE products SET name = $1, description = $2, price = $3, category = $4, stock_quantity = $5, image_url = $6 WHERE id = $5 RETURNING *',
+            [name, description, price, category, stock_quantity, image_url]
         );
 
         successResponse(res, {
