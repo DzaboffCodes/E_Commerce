@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../Login.css";
 
-function LoginPage() {
+function LoginPage({setUser}) {
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -63,7 +63,8 @@ function LoginPage() {
       if (!response.ok) {
         throw new Error(data.message || "Login failed. Please check your details and try again.");
       }
-
+      
+      setUser(data?.data?.user || null)
       navigate("/");
     } catch (err) {
       setServerError(err.message);

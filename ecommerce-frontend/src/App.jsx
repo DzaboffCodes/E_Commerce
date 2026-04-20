@@ -1,4 +1,5 @@
-import {Routes, Route, Link} from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import "./App.css";
 
 // Import component pages
@@ -12,16 +13,47 @@ import LoginPage from './components/Login';
 
 
 function App() {
+  // Add user state to show logged in user
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/auth/me", {
+          method: "GET",
+          credentials: "include"
+        })
+        const data = await response.json();
+        
+        if (response.ok) {
+          setUser(data?.data?.user || null);
+        } else {
+          setUser(null)
+        }
+      } catch {
+        setUser(null)
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    checkSession();
+  }, []);
+
+  if (!authChecked) {
+    return <div>Checking session...</div>
+  }
+
   return (
     <>
-      <Header />
+      <Header user={user} setUser={setUser}/>
 
       {/* Routes matches current URL and chooses which page component to render */}
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/products' element={<ProductsPage />} />
-        <Route path='/register' element={<RegisterPage />}/>
-        <Route path='/login' element={<LoginPage />}/>
+        <Route path='/register' element={<RegisterPage />} />
+        <Route path='/login' element={<LoginPage setUser={setUser} />} />
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
