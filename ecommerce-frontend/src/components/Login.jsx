@@ -55,6 +55,7 @@ function LoginPage() {
           email: form.email,
           password: form.password,
         }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -84,10 +85,6 @@ function LoginPage() {
         <section className="login-right">
           <h2>Sign in</h2>
 
-          <p className="signin-text">
-            Don't have an account? <Link to="/register">Create one</Link>
-          </p>
-
           <form onSubmit={onSubmit} className="login-form">
             <label>
               Email address
@@ -113,9 +110,9 @@ function LoginPage() {
               {errors.password && <span className="field-error">{errors.password}</span>}
             </label>
 
-            <div className="forgot-row">
+            {/* <div className="forgot-row">
               <Link to="/forgot-password">Forgot your password?</Link>
-            </div>
+            </div> */}
 
             {serverError && <div className="form-error">{serverError}</div>}
 
@@ -123,17 +120,6 @@ function LoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
-
-          <div className="login-divider">or continue with</div>
-
-          <div className="social-row">
-            <button type="button" className="social-btn">
-              Google
-            </button>
-            <button type="button" className="social-btn">
-              Facebook
-            </button>
-          </div>
 
           <p className="login-footer-link">
             New to HAUL? <Link to="/register">Create a free account</Link>

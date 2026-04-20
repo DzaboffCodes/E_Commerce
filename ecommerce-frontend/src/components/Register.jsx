@@ -85,7 +85,8 @@ function RegisterPage() {
                     last_name: form.last_name,
                     email: form.email,
                     password: form.password
-                })
+                }), 
+                credentials: "include"
             });
 
             // Parse JSON Body
@@ -103,106 +104,106 @@ function RegisterPage() {
             // Show Error in UI
             setServerError(err.message);
         } finally {
-        // Turn Off Loading
-        setLoading(false);
-    }
-};
+            // Turn Off Loading
+            setLoading(false);
+        }
+    };
 
-return (
-    <main className="register-shell">
-        <section className="register-card">
-            <aside className="register-left">
-                <h1 className="brand">HAUL</h1>
-                <h2>Start your haul.</h2>
-                <p>One account. Everything you need.</p>
+    return (
+        <main className="register-shell">
+            <section className="register-card">
+                <aside className="register-left">
+                    <h1 className="brand">HAUL</h1>
+                    <h2>Start your haul.</h2>
+                    <p>One account. Everything you need.</p>
 
-                <ul>
-                    <li>Track all your orders in one place</li>
-                    <li>Faster checkout every time</li>
-                    <li>Personalized picks just for you</li>
-                    <li>Easy returns and order history</li>
-                </ul>
+                    <ul>
+                        <li>Track all your orders in one place</li>
+                        <li>Faster checkout every time</li>
+                        <li>Personalized picks just for you</li>
+                        <li>Easy returns and order history</li>
+                    </ul>
 
-                <small>Free to join. No spam. No nonsense.</small>
-            </aside>
+                    <small>Free to join. No spam. No nonsense.</small>
+                </aside>
 
-            <section className="register-right">
-                <h2>Create your account</h2>
-                <p className="signin-text">
-                    Already have an account? <a href="/login">Sign in</a>
-                </p>
+                <section className="register-right">
+                    <h2>Create your account</h2>
+                    <p className="signin-text">
+                        Already have an account? <a href="/login">Sign in</a>
+                    </p>
 
-                <form onSubmit={onSubmit} className="register-form">
-                    <div className="name-row">
+                    <form onSubmit={onSubmit} className="register-form">
+                        <div className="name-row">
+                            <label>
+                                First name
+                                <input
+                                    name="first_name"
+                                    value={form.first_name}
+                                    onChange={onChange}
+                                    placeholder="First name"
+                                />
+                                {errors.first_name && <span className='field-error'>{errors.first_name}</span>}
+                            </label>
+
+                            <label>
+                                Last name
+                                <input
+                                    name="last_name"
+                                    value={form.last_name}
+                                    onChange={onChange}
+                                    placeholder="Last name"
+                                />
+                                {errors.last_name && <span className='field-error'>{errors.last_name}</span>}
+                            </label>
+                        </div>
+
                         <label>
-                            First name
+                            Email address
                             <input
-                                name="first_name"
-                                value={form.first_name}
+                                name="email"
+                                type="email"
+                                value={form.email}
                                 onChange={onChange}
-                                placeholder="First name"
+                                placeholder="you@email.com"
                             />
-                            {errors.first_name && <span className='field-error'>{errors.first_name}</span>}
+                            {errors.email && <span className='field-error'>{errors.email}</span>}
                         </label>
 
                         <label>
-                            Last name
+                            Password
                             <input
-                                name="last_name"
-                                value={form.last_name}
+                                name="password"
+                                type="password"
+                                value={form.password}
                                 onChange={onChange}
-                                placeholder="Last name"
+                                placeholder="Create a password"
                             />
-                            {errors.last_name && <span className='field-error'>{errors.last_name}</span>}
+                            {errors.password && <span className='field-error'>{errors.password}</span>}
                         </label>
-                    </div>
 
-                    <label>
-                        Email address
-                        <input
-                            name="email"
-                            type="email"
-                            value={form.email}
-                            onChange={onChange}
-                            placeholder="you@email.com"
-                        />
-                        {errors.email && <span className='field-error'>{errors.email}</span>}
-                    </label>
+                        <label>
+                            Confirm password
+                            <input
+                                name="confirmPassword"
+                                type="password"
+                                value={form.confirmPassword}
+                                onChange={onChange}
+                                placeholder="Confirm your password"
+                            />
+                            {errors.confirmPassword && <span className='field-error'>{errors.confirmPassword}</span>}
+                        </label>
 
-                    <label>
-                        Password
-                        <input
-                            name="password"
-                            type="password"
-                            value={form.password}
-                            onChange={onChange}
-                            placeholder="Create a password"
-                        />
-                        {errors.password && <span className='field-error'>{errors.password}</span>}
-                    </label>
+                        {serverError && <div className="form-error">{serverError}</div>}
 
-                    <label>
-                        Confirm password
-                        <input
-                            name="confirmPassword"
-                            type="password"
-                            value={form.confirmPassword}
-                            onChange={onChange}
-                            placeholder="Confirm your password"
-                        />
-                        {errors.confirmPassword && <span className='field-error'>{errors.confirmPassword}</span>}
-                    </label>
-
-                    {serverError && <div className="form-error">{serverError}</div>}
-
-                    <button type="submit" className="create-btn" disabled={loading}>
-                        {loading ? "Creating Account" : "Create Account"}
-                    </button>
-                </form>
+                        <button type="submit" className="create-btn" disabled={loading}>
+                            {loading ? "Creating Account" : "Create Account"}
+                        </button>
+                    </form>
+                </section>
             </section>
-        </section>
-    </main>
-);
+        </main>
+    );
 }
 
 export default RegisterPage;
