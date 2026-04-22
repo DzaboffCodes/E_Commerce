@@ -1,6 +1,7 @@
 // Route level page component for Products Page
 import { useState, useEffect } from 'react';
-import ProductList from "./ProductList"
+import ProductList from "./ProductList";
+import './Products.css';
 
 function ProductsPage() {
   // States
@@ -39,10 +40,10 @@ function ProductsPage() {
   }
 
   return (
-    <>
+    <div className="products-page">
       <h1>Products</h1>
       <ProductList products={products}/>
-    </>
+    </div>
   );
 };
 
