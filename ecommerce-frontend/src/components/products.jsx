@@ -12,7 +12,7 @@ function ProductsPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/products', {
+        const response = await fetch('http://localhost:3000/products?limit=1000', {
           method: "GET",
         })
         const data = await response.json();
