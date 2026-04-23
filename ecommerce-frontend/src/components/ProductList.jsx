@@ -1,6 +1,6 @@
 import Product from './Product';
 
-function ProductList({ products }) {
+function ProductList({ products, user}) {
     if (!products || products.length === 0) {
         return <p>No products found.</p>;
     }
@@ -8,7 +8,7 @@ function ProductList({ products }) {
     return (
         <ul className="product-grid">
             {products.map((product) => (
-                <Product key={product.id} product={product} />
+                <Product key={product.id} product={product} user={user}/>
             ))}
         </ul>
     );

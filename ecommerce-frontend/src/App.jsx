@@ -52,7 +52,7 @@ function App() {
       {/* Routes matches current URL and chooses which page component to render */}
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/products' element={<ProductsPage />} />
+        <Route path='/products' element={<ProductsPage user={user} />} />
         <Route path='/products/:id' element={<ProductDetailsPage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage setUser={setUser} />} />

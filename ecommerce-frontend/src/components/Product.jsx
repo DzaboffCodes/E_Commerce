@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-function Product({ product }) {
+function Product({ product, user}) {
+  const navigate = useNavigate();
+  
   return (
     <li className="product-card">
       <Link to={`/products/${product.id}`}>
@@ -16,7 +18,7 @@ function Product({ product }) {
       </Link>
 
       <div className="product-info">
-        <Link to={`products/${product.id}`}>
+        <Link to={`/products/${product.id}`}>
           <h3 className="product-name">{product.name}</h3>
         </Link>
         <p className="product-category">{product.category}</p>
@@ -24,7 +26,17 @@ function Product({ product }) {
 
       <div className="product-footer">
         <span className="product-price">${Number(product.price).toFixed(2)}</span>
-        <button className="product-add-btn">Add</button>
+        {user ? (
+          <button className="product-add-btn">Add</button>
+        ) : (
+          <button
+          className="product-add-btn"
+          type="button"
+          onClick={() => navigate('/login')}
+          >
+            Log in to add
+          </button>
+        )}
       </div>
     </li>
   );

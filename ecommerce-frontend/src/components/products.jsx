@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import ProductList from "./ProductList";
 import './Products.css';
 
-function ProductsPage() {
+function ProductsPage({ user }) {
   // States
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ function ProductsPage() {
   return (
     <div className="products-page">
       <h1>Products</h1>
-      <ProductList products={products}/>
+      <ProductList products={products} user={user}/>
     </div>
   );
 };
