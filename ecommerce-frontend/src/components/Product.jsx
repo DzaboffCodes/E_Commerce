@@ -1,18 +1,24 @@
+import { Link } from "react-router-dom";
+
 function Product({ product }) {
   return (
     <li className="product-card">
-      {product.image_url ? (
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="product-image"
-        />
-      ) : (
-        <div className="product-image-placeholder">IMG</div>
-      )}
+      <Link to={`/products/${product.id}`}>
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="product-image"
+          />
+        ) : (
+          <div className="product-image-placeholder">IMG</div>
+        )}
+      </Link>
 
       <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
+        <Link to={`products/${product.id}`}>
+          <h3 className="product-name">{product.name}</h3>
+        </Link>
         <p className="product-category">{product.category}</p>
       </div>
 

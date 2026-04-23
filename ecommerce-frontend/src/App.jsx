@@ -10,6 +10,7 @@ import ProductsPage from './components/Products';
 import NotFoundPage from './components/Not_found';
 import RegisterPage from './components/Register';
 import LoginPage from './components/Login';
+import ProductDetailsPage from './components/ProductDetailsPage';
 
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/products' element={<ProductsPage />} />
+        <Route path='/products/:id' element={<ProductDetailsPage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage setUser={setUser} />} />
         {/* Catch all route for bad URLs */}
