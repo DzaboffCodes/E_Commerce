@@ -93,7 +93,7 @@ router.post('/', isAuthenticated, cartController.createCart);
  *                             properties:
  *                               id:
  *                                 type: integer
- *                               product_id:
+ *                               productId:
  *                                 type: integer
  *                               quantity:
  *                                 type: integer
@@ -154,10 +154,10 @@ router.get('/:cartId', isAuthenticated, validateCartId, cartController.getCart);
  *           schema:
  *             type: object
  *             required:
- *               - product_id
+ *               - productId
  *               - quantity
  *             properties:
- *               product_id:
+ *               productId:
  *                 type: integer
  *                 example: 1
  *               quantity:
@@ -184,7 +184,7 @@ router.get('/:cartId', isAuthenticated, validateCartId, cartController.getCart);
  *                               type: integer
  *                             cart_id:
  *                               type: integer
- *                             product_id:
+ *                             productId:
  *                               type: integer
  *                             quantity:
  *                               type: integer

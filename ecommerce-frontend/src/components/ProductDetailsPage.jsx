@@ -1,15 +1,70 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './ProductDetailsPage.css'
 
-function ProductDetailsPage() {
+function ProductDetailsPage({user}) {
     // Get id from parameters
     let { id } = useParams();
+
+    const navigate = useNavigate();
 
     // States
     const [product, setProduct] = useState({});
     const [loading, setLoading] = useState(true);
     const [serverError, setServerError] = useState("");
+    const [adding, setAdding] = useState(false);
+    const [cartMessage, setCartMessage] = useState("");
+
+    const handleAddClick = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
+        setAdding(true);
+        setCartMessage("");
+
+        try {
+            let cartId = localStorage.getItem('activeCartId');
+
+            // Create cart once (or reuse existing)
+            if (!cartId) {
+                const cartResponse = await fetch("http://localhost:3000/cart", {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                const cartData = await cartResponse.json();
+                if (!cartResponse.ok) {
+                    throw new Error(cartData?.message || "Could not create cart");
+                }
+
+                cartId = cartData?.data?.cart?.id;
+                localStorage.setItem("activeCartId", String(cartId))
+            }
+
+            const addResponse = await fetch(`http://localhost:3000/cart/${cartId}/items`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    productId: product.id,
+                    qty: 1,
+                }),
+            });
+
+            const addData = await addResponse.json();
+            if (!addResponse.ok) {
+                throw new Error(addData?.message || "Could not add item to cart");
+            }
+
+            setCartMessage("Added to cart")
+        } catch (err) {
+            setCartMessage(err.message);
+        } finally {
+            setAdding(false);
+        }
+    };
 
     // UseEffect to fetch specific product 
     useEffect(() => {
@@ -77,7 +132,14 @@ function ProductDetailsPage() {
                     </div>
 
                     <div className="product-details-actions">
-                        <button className="product-add-to-cart-btn">Add to Cart</button>
+                        <button 
+                        className="product-add-to-cart-btn" 
+                        onClick={handleAddClick}
+                        disabled={adding}
+                        >
+                            {adding ? "Adding..." : "Add to Cart"}
+                        </button>
+                    {cartMessage && <p>{cartMessage}</p>}
                     </div>
                 </div>
             </div>

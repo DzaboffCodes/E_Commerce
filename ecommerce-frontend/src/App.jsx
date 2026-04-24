@@ -52,7 +52,7 @@ function App() {
       <Routes>
         <Route path='/' element={<ProductsPage user={user} />} />
         <Route path='/products' element={<ProductsPage user={user} />} />
-        <Route path='/products/:id' element={<ProductDetailsPage />} />
+        <Route path='/products/:id' element={<ProductDetailsPage user={user}/>} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage setUser={setUser} />} />
         {/* Catch all route for bad URLs */}
