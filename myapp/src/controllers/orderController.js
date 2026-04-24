@@ -97,7 +97,7 @@ const updateOrderStatus = async (req, res) => {
         
         // Update order status
         const result = await db.query(
-            'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+            'UPDATE orders SET status = $1, modified = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
             [status, id]
         );
         
@@ -136,7 +136,7 @@ const cancelOrder = async (req, res) => {
         
         // Update order status to cancelled
         const result = await db.query(
-            'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+            'UPDATE orders SET status = $1, modified = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
             ['cancelled', id]
         );
         

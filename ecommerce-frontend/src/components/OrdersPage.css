@@ -105,3 +105,119 @@
   color: #0369a1;
   margin-top: 6px;
 }
+
+.order-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: none;
+  border: none;
+  padding: 24px 28px;
+  cursor: pointer;
+  text-align: left;
+  flex-wrap: wrap;
+}
+
+.order-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.order-chevron {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Override the existing .order-card padding since header now handles it */
+.order-card {
+  padding: 0;
+}
+
+.order-status--cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.order-status--delivered {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.order-status--shipped {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.order-items {
+  padding: 0 28px 24px;
+  border-top: 1px solid #e8f0f8;
+}
+
+.order-items-loading {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+
+.order-items-list {
+  list-style: none;
+  margin: 16px 0 20px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.order-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.order-item-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.order-item-meta {
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.order-item-subtotal {
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  min-width: 64px;
+  text-align: right;
+}
+
+.order-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #fca5a5;
+  background: #fff;
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.order-cancel-btn:hover:not(:disabled) {
+  background: #fee2e2;
+  transform: translateY(-1px);
+}
+
+.order-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
