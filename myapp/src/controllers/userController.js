@@ -7,7 +7,7 @@ const getUserById = async (req, res) => {
         const { id } = req.params;
         
         const result = await db.query(
-            'SELECT id, email, first_name, last_name, created_at FROM users WHERE id = $1', 
+            'SELECT id, email, first_name, last_name FROM users WHERE id = $1', 
             [id]
         );
         
@@ -39,7 +39,7 @@ const updateUser = async (req, res) => {
         
         // Update the user
         const result = await db.query(
-            'UPDATE users SET email = $1, first_name = $2, last_name = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id, email, first_name, last_name, updated_at',
+            'UPDATE users SET email = $1, first_name = $2, last_name = $3 WHERE id = $4 RETURNING id, email, first_name, last_name',
             [email, first_name, last_name, id]
         );
         

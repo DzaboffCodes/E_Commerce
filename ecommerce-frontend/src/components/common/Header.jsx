@@ -39,6 +39,7 @@ function Header({ user, setUser }) {
                     )}
                     {user && <Link to="/cart">Cart</Link>}
                     {user && <Link to="/orders">Orders</Link>}
+                    {user && <Link to="/profile">Profile</Link>}
                 </ul>
             </nav>
         </header>
