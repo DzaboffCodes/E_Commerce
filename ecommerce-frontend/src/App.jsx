@@ -10,6 +10,7 @@ import NotFoundPage from './components/Not_found';
 import RegisterPage from './components/Register';
 import LoginPage from './components/Login';
 import ProductDetailsPage from './components/ProductDetailsPage';
+import CartPage from './components/CartPage';
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <Route path='/products/:id' element={<ProductDetailsPage user={user}/>} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage setUser={setUser} />} />
+        <Route path='/cart' element={<CartPage />} />
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>

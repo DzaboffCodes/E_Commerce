@@ -37,6 +37,7 @@ function Header({ user, setUser }) {
                     {user && (
                         <button type="button" onClick={handleLogout}>Logout</button>
                     )}
+                    {user && <Link to="/cart">Cart</Link>}
                 </ul>
             </nav>
         </header>
