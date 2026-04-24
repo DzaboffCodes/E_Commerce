@@ -15,7 +15,7 @@ const getAllOrders = async (req, res) => {
             params.push(status);
         }
         
-        query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
+        query += ' ORDER BY created DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
         params.push(parseInt(limit), parseInt(offset));
         
         const result = await db.query(query, params);
