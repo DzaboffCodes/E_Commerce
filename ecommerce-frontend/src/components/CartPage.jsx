@@ -11,6 +11,8 @@ function CartPage() {
     const [error, setError] = useState("");
     const [removingItemId, setRemovingItemId] = useState(null);
     const [checkingOut, setCheckingOut] = useState(false);
+    const [updatingItemId, setUpdatingItemId] = useState(null);
+
 
     const loadCart = async () => {
         setLoading(true);
@@ -97,7 +99,7 @@ function CartPage() {
         }
     };
 
-        const handleCheckout = async () => {
+    const handleCheckout = async () => {
         const cartId = localStorage.getItem("activeCartId");
 
         if (!cartId) return;
@@ -128,6 +130,72 @@ function CartPage() {
             setError(err.message || "Unable to complete checkout");
         } finally {
             setCheckingOut(false);
+        }
+    };
+
+    const handleIncrease = async (item) => {
+        const cartId = localStorage.getItem("activeCartId");
+        if (!cartId) return;
+
+        setUpdatingItemId(item.cart_item_id);
+        setError("");
+
+        try {
+            const response = await fetch(`http://localhost:3000/cart/${cartId}/items`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    productId: item.product_id,
+                    qty: 1,
+                }),
+            });
+
+            if (response.status === 401) {
+                navigate("/login");
+                return;
+            }
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.message || "Unable to increase quantity");
+
+            await loadCart();
+        } catch (err) {
+            setError(err.message || "Unable to increase quantity");
+        } finally {
+            setUpdatingItemId(null);
+        }
+    };
+
+    const handleDecrease = async (item) => {
+        const cartId = localStorage.getItem("activeCartId");
+        if (!cartId) return;
+
+        setUpdatingItemId(item.cart_item_id);
+        setError("");
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/cart/${cartId}/items/${item.cart_item_id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                }
+            );
+
+            if (response.status === 401) {
+                navigate("/login");
+                return;
+            }
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.message || "Unable to decrease quantity");
+
+            await loadCart();
+        } catch (err) {
+            setError(err.message || "Unable to decrease quantity");
+        } finally {
+            setUpdatingItemId(null);
         }
     };
 
@@ -186,27 +254,46 @@ function CartPage() {
                                 <h3 className="cart-item-title">{item.product_name}</h3>
 
                                 <div className="cart-meta">
-                                    <span className="cart-meta-chip">Qty: {item.qty}</span>
-                                    <span className="cart-meta-chip">
-                                        Price: ${Number(item.price).toFixed(2)}
-                                    </span>
+                                    <div className="cart-qty-control">
+                                        <button
+                                            type="button"
+                                            className="cart-qty-btn"
+                                            onClick={() => handleDecrease(item)}
+                                            disabled={updatingItemId === item.cart_item_id}
+                                        >
+                                            -
+                                        </button>
+
+                                        <span className="cart-meta-chip">Qty: {item.qty}</span>
+
+                                        <button
+                                            type="button"
+                                            className="cart-qty-btn"
+                                            onClick={() => handleIncrease(item)}
+                                            disabled={updatingItemId === item.cart_item_id}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+
+                                    <span className="cart-meta-chip">Price: ${Number(item.price).toFixed(2)}</span>
                                 </div>
-                            </div>
 
-                            <div className="cart-subtotal">
-                                <p className="cart-subtotal-label">Subtotal</p>
-                                <p className="cart-subtotal-value">
-                                    ${Number(item.subtotal).toFixed(2)}
-                                </p>
+                                <div className="cart-subtotal">
+                                    <p className="cart-subtotal-label">Subtotal</p>
+                                    <p className="cart-subtotal-value">
+                                        ${Number(item.subtotal).toFixed(2)}
+                                    </p>
 
-                                <button
-                                    type="button"
-                                    className="cart-remove-btn"
-                                    onClick={() => handleRemove(item.cart_item_id)}
-                                    disabled={removingItemId === item.cart_item_id}
-                                >
-                                    {removingItemId === item.cart_item_id ? "Removing..." : "Remove"}
-                                </button>
+                                    <button
+                                        type="button"
+                                        className="cart-remove-btn"
+                                        onClick={() => handleRemove(item.cart_item_id)}
+                                        disabled={removingItemId === item.cart_item_id}
+                                    >
+                                        {removingItemId === item.cart_item_id ? "Removing..." : "Remove"}
+                                    </button>
+                                </div>
                             </div>
                         </li>
                     ))}

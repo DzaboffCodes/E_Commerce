@@ -25,34 +25,50 @@ const createCart = async (req, res) => {
 const getCart = async (req, res) => {
     try {
         const { cartId } = req.params;
-        
-        // Join tables to get product details for the cart items
+        const userId = req.user.id;
+
+        // 1) Verify cart exists and belongs to this user
+        const cartCheck = await db.query(
+            'SELECT id FROM cart WHERE id = $1 AND userid = $2',
+            [cartId, userId]
+        );
+
+        if (cartCheck.rows.length === 0) {
+            return errorResponse(res, 'Cart not found or does not belong to you', 404, 'CART_NOT_FOUND');
+        }
+
+        // 2) Fetch cart items
         const result = await db.query(
-            `SELECT 
+            `SELECT
                 ci.id AS cart_item_id,
+                p.id AS product_id,
                 p.name AS product_name,
                 p.price,
                 ci.qty,
-                (p.price * ci.qty) as subtotal
+                (p.price * ci.qty) AS subtotal
              FROM cart_items ci
              JOIN products p ON ci."productid" = p.id
              WHERE ci."cartid" = $1`,
             [cartId]
         );
-        
+
+        // 3) Empty cart should still be a successful response
         if (result.rows.length === 0) {
-            return errorResponse(res, 'Cart not found or is empty', 404, 'CART_EMPTY');
+            return successResponse(res, {
+                cartId: cartId,
+                items: [],
+                total: "0.00"
+            }, 'Cart retrieved successfully');
         }
-        
-        // Calculate total
+
+        // 4) Compute total for non-empty cart
         const total = result.rows.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
-        
+
         successResponse(res, {
             cartId: cartId,
             items: result.rows,
             total: total.toFixed(2)
         }, 'Cart retrieved successfully');
-        
     } catch (error) {
         console.error('Error fetching cart:', error);
         errorResponse(res, 'Server error while fetching cart', 500, 'FETCH_CART_ERROR');
@@ -114,36 +130,35 @@ const addToCart = async (req, res) => {
 
 // Remove item from cart
 const removeFromCart = async (req, res) => {
-    try {
-        const { cartId, itemId } = req.params;
-        const userId = req.user.id;
-        
-        console.log(`Attempting to delete Item ${itemId} from Cart ${cartId} by User ${userId}`);
-        
-        // Check if the cart belongs to the user, and if the item is in it
-        const itemCheck = await db.query(
-            `SELECT ci.id 
-             FROM cart_items ci
-             JOIN cart c ON ci.cartid = c.id
-             WHERE ci.id = $1 AND ci.cartid = $2 AND c.userid = $3`,
-            [itemId, cartId, userId]
-        );
-        
-        console.log('Query result:', itemCheck.rows);
-        
-        if (itemCheck.rows.length === 0) {
-            return errorResponse(res, 'Cart item not found or does not belong to you', 404, 'CART_ITEM_NOT_FOUND');
-        }
-        
-        // Delete the cart item
-        await db.query('DELETE FROM cart_items WHERE id = $1', [itemId]);
-        
-        successResponse(res, null, 'Cart item deleted successfully');
-        
-    } catch (error) {
-        console.error('Error deleting cart item:', error);
-        errorResponse(res, 'Server error during cart item deletion', 500, 'DELETE_CART_ITEM_ERROR');
+  try {
+    const { cartId, itemId } = req.params;
+    const userId = req.user.id;
+
+    const itemCheck = await db.query(
+      `SELECT ci.id, ci.qty
+       FROM cart_items ci
+       JOIN cart c ON ci.cartid = c.id
+       WHERE ci.id = $1 AND ci.cartid = $2 AND c.userid = $3`,
+      [itemId, cartId, userId]
+    );
+
+    if (itemCheck.rows.length === 0) {
+      return errorResponse(res, 'Cart item not found or does not belong to you', 404, 'CART_ITEM_NOT_FOUND');
     }
+
+    const currentQty = itemCheck.rows[0].qty;
+
+    if (currentQty > 1) {
+      await db.query('UPDATE cart_items SET qty = qty - 1 WHERE id = $1', [itemId]);
+      return successResponse(res, null, 'Cart item quantity decreased');
+    }
+
+    await db.query('DELETE FROM cart_items WHERE id = $1', [itemId]);
+    successResponse(res, null, 'Cart item deleted successfully');
+  } catch (error) {
+    console.error('Error deleting cart item:', error);
+    errorResponse(res, 'Server error during cart item deletion', 500, 'DELETE_CART_ITEM_ERROR');
+  }
 };
 
 // Checkout cart
