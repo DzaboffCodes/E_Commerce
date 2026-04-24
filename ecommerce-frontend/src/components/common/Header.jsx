@@ -18,18 +18,18 @@ function Header({ user, setUser }) {
             setUser(null);
             navigate('/login');
         }
-};
+    };
 
     return (
         <header>
-            <h1 className='brand'>HAUL</h1>
+            <h1 className='brand'>
+                <Link to='/products'>HAUL</Link>
+            </h1>
 
             {/* Link changes URL without full page refresh */}
             <nav>
                 <ul>
-                    <Link to="/">Home</Link>
                     <Link to="/products">Products</Link>
-
                     {!user && <Link to='/register'>Register</Link>}
                     {!user && <Link to='/login'>Login</Link>}
 
