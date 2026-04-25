@@ -114,3 +114,26 @@
     font-size: 28px;
   }
 }
+
+.product-go-to-cart-btn {
+  background: #ffffff;
+  color: #1d4ed8;
+  border: 1px solid #1d4ed8;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.product-go-to-cart-btn:hover {
+  background: #eff6ff;
+}
+
+.product-cart-message {
+  margin-top: 12px;
+  text-align: center;
+  color: #166534;
+  font-weight: 500;
+}

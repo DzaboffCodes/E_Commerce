@@ -72,12 +72,15 @@
 
 .product-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 12px 14px;
 }
 
 .product-price {
+  display: block;
+  width: 100%;
+  text-align: center;
   font-size: 15px;
   font-weight: 700;
   color: #111;

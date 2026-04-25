@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './ProductDetailsPage.css'
 
-function ProductDetailsPage({user}) {
+function ProductDetailsPage({ user }) {
     // Get id from parameters
     let { id } = useParams();
 
@@ -14,8 +14,12 @@ function ProductDetailsPage({user}) {
     const [serverError, setServerError] = useState("");
     const [adding, setAdding] = useState(false);
     const [cartMessage, setCartMessage] = useState("");
+    const [addedToCart, setAddedToCart] = useState(false);
 
     const handleAddClick = async () => {
+        setCartMessage("");
+        setAddedToCart(false);
+
         if (!user) {
             navigate('/login');
             return;
@@ -45,7 +49,7 @@ function ProductDetailsPage({user}) {
 
             const addResponse = await fetch(`http://localhost:3000/cart/${cartId}/items`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
                     productId: product.id,
@@ -59,8 +63,10 @@ function ProductDetailsPage({user}) {
             }
 
             setCartMessage("Added to cart")
+            setAddedToCart(true);
         } catch (err) {
             setCartMessage(err.message);
+            setAddedToCart(false);
         } finally {
             setAdding(false);
         }
@@ -132,15 +138,26 @@ function ProductDetailsPage({user}) {
                     </div>
 
                     <div className="product-details-actions">
-                        <button 
-                        className="product-add-to-cart-btn" 
-                        onClick={handleAddClick}
-                        disabled={adding}
+                        <button
+                            className="product-add-to-cart-btn"
+                            onClick={handleAddClick}
+                            disabled={adding}
                         >
                             {adding ? "Adding..." : "Add to Cart"}
                         </button>
-                    {cartMessage && <p>{cartMessage}</p>}
+
+                        {addedToCart && (
+                            <button
+                                type="button"
+                                className="product-go-to-cart-btn"
+                                onClick={() => navigate("/cart")}
+                            >
+                                Go to Cart
+                            </button>
+                        )}
                     </div>
+
+                    {cartMessage && <p className="product-cart-message">{cartMessage}</p>}
                 </div>
             </div>
         </div>

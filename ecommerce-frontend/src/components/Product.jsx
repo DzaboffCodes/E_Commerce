@@ -1,7 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-function Product({ product, user}) {
-  const navigate = useNavigate();
+function Product({ product}) {
   
   return (
     <li className="product-card">
@@ -26,17 +25,6 @@ function Product({ product, user}) {
 
       <div className="product-footer">
         <span className="product-price">${Number(product.price).toFixed(2)}</span>
-        {user ? (
-          <button className="product-add-btn">Add</button>
-        ) : (
-          <button
-          className="product-add-btn"
-          type="button"
-          onClick={() => navigate('/login')}
-          >
-            Log in to add
-          </button>
-        )}
       </div>
     </li>
   );
