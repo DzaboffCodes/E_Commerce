@@ -1,5 +1,5 @@
 .products-page {
-  padding: 40px 24px;
+  padding: 20px 24px 40px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -8,7 +8,7 @@
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: #111;
+  color: #1f5fa6;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
