@@ -1,21 +1,24 @@
-// Import Link from React Router DOM
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
-// Footer component is a persisent layout component
 function Footer() {
     return (
-        <footer>
-            <h3>Haul</h3>
-            <p>Your everyday marketplace</p>
-            <p>© {new Date().getFullYear()} Haul. All rights reserved.</p>
-            
-            {/* Nav has a placeholder for right now */}
-            <nav>
-                <Link to="/products">Products</Link>
-                {/* Link to Orders, Contact, Privacy, Terms, etc. */}
-            </nav>
+        <footer className="site-footer">
+            <div className="footer-inner">
+                <div className="footer-brand">
+                    <span className="footer-logo">HAUL</span>
+                    <p className="footer-tagline">Your everyday marketplace</p>
+                </div>
+
+                <nav className="footer-nav">
+                    <Link to="/products">Products</Link>
+                    <Link to="/cart">Cart</Link>
+                    <Link to="/orders">Orders</Link>
+                </nav>
+
+                <p className="footer-copy">© {new Date().getFullYear()} Haul. All rights reserved.</p>
+            </div>
         </footer>
-    )
+    );
 }
 
 export default Footer;
