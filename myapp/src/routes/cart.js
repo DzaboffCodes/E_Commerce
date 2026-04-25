@@ -350,4 +350,10 @@ router.post('/:cartId/checkout',
     cartController.checkoutCart
 );
 
+router.post('/:cartId/payment-intent',
+    isAuthenticated,
+    validateCartId,
+    cartController.createPaymentIntent
+);
+
 module.exports = router;
