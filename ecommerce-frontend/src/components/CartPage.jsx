@@ -10,7 +10,6 @@ function CartPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [removingItemId, setRemovingItemId] = useState(null);
-    const [checkingOut, setCheckingOut] = useState(false);
     const [updatingItemId, setUpdatingItemId] = useState(null);
 
 
@@ -96,40 +95,6 @@ function CartPage() {
             setError(err.message || "Unable to remove item");
         } finally {
             setRemovingItemId(null);
-        }
-    };
-
-    const handleCheckout = async () => {
-        const cartId = localStorage.getItem("activeCartId");
-
-        if (!cartId) return;
-
-        setCheckingOut(true);
-        setError("");
-
-        try {
-            const response = await fetch(`http://localhost:3000/cart/${cartId}/checkout`, {
-                method: "POST",
-                credentials: "include",
-            });
-
-            if (response.status === 401) {
-                navigate("/login");
-                return;
-            }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data?.message || "Unable to complete checkout");
-            }
-
-            localStorage.removeItem("activeCartId");
-            navigate("/orders");
-        } catch (err) {
-            setError(err.message || "Unable to complete checkout");
-        } finally {
-            setCheckingOut(false);
         }
     };
 
@@ -316,10 +281,9 @@ function CartPage() {
                         <button
                             type="button"
                             className="cart-btn cart-btn-primary"
-                            onClick={handleCheckout}
-                            disabled={checkingOut}
+                            onClick={() => navigate("/checkout")}
                         >
-                            {checkingOut ? "Processing..." : "Proceed to Checkout"}
+                            Proceed to Checkout
                         </button>
 
                         <Link to="/products" className="cart-btn cart-btn-secondary">

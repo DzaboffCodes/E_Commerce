@@ -1,0 +1,150 @@
+.checkout-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.checkout-page h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 32px;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.checkout-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checkout-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.checkout-stripe-input {
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+  transition: border-color 0.18s ease;
+}
+
+.checkout-stripe-input:focus-within {
+  border-color: #1f5fa6;
+}
+
+.checkout-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkout-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.checkout-item-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.checkout-item-name {
+  flex: 1;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.checkout-item-meta {
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.checkout-item-subtotal {
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.checkout-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f5fa6;
+  padding-top: 16px;
+  border-top: 1px solid #dbe4f0;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkout-card-field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.checkout-card-element {
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.checkout-error {
+  color: #b91c1c;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.checkout-pay-btn {
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: #1f5fa6;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.checkout-pay-btn:hover:not(:disabled) {
+  background: #1a4f8a;
+}
+
+.checkout-pay-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkout-feedback {
+  text-align: center;
+  color: #64748b;
+  margin-top: 60px;
+}
+
+@media (max-width: 768px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+}

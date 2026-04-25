@@ -13,6 +13,7 @@ import ProductDetailsPage from './components/ProductDetailsPage';
 import CartPage from './components/CartPage';
 import OrdersPage from './components/OrdersPage';
 import ProfilePage from './components/ProfilePage';
+import CheckoutPage from './components/CheckoutPage';
 
 
 
@@ -62,6 +63,7 @@ function App() {
         <Route path='/profile' element={<ProfilePage user={user} setUser={setUser} />} />
         <Route path='/cart' element={<CartPage />} />
         <Route path='/orders' element={<OrdersPage />} />
+        <Route path='/checkout' element={<CheckoutPage />} />
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
