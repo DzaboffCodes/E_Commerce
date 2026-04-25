@@ -11,7 +11,7 @@ function Footer() {
             
             {/* Nav has a placeholder for right now */}
             <nav>
-                <Link to="/">Home</Link> | <Link to="/products">Products</Link>
+                <Link to="/products">Products</Link>
                 {/* Link to Orders, Contact, Privacy, Terms, etc. */}
             </nav>
         </footer>
