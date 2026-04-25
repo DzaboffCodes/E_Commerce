@@ -297,4 +297,7 @@ router.put('/:id/status', isAuthenticated, validateId, orderController.updateOrd
  */
 router.post('/:id/cancel', isAuthenticated, validateId, orderController.cancelOrder);
 
+router.post("/:id/payment-intent", isAuthenticated, validateId, orderController.createOrderPaymentIntent);
+router.post("/:id/confirm-payment", isAuthenticated, validateId, orderController.confirmOrderPayment);
+
 module.exports = router;

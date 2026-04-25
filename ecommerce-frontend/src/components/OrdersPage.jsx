@@ -103,7 +103,9 @@ function OrdersPage() {
               <button className="order-card-header" onClick={() => handleToggle(order.id)}>
                 <div className="order-card-info">
                   <h3>Order #{order.id}</h3>
-                  <span className={`order-status order-status--${order.status}`}>{order.status}</span>
+                  <span className={`order-status order-status--${order.status}`}>
+                    {order.status === "successful" ? "Order has been successfully placed" : order.status}
+                  </span>
                 </div>
                 <div className="order-card-right">
                   <div className="order-card-total">${Number(order.total).toFixed(2)}</div>
@@ -137,6 +139,15 @@ function OrdersPage() {
                           disabled={cancellingId === order.id}
                         >
                           {cancellingId === order.id ? "Cancelling..." : "Cancel Order"}
+                        </button>
+                      )}
+
+                      {order.status === "pending" && (
+                        <button
+                          className="order-pay-btn"
+                          onClick={() => navigate(`/orders/${order.id}/pay`)}
+                        >
+                          Pay Now
                         </button>
                       )}
                     </>

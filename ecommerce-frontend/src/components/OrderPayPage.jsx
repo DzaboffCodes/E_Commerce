@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import "./CheckoutPage.css";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -18,23 +25,21 @@ const stripeInputStyle = {
   },
 };
 
-function CheckoutForm({ cartId, total }) {
+function OrderPayForm({ orderId, total }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
-
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
-
     setProcessing(true);
     setError("");
 
     try {
-      const intentRes = await fetch(`http://localhost:3000/cart/${cartId}/payment-intent`, {
+      const intentRes = await fetch(`http://localhost:3000/orders/${orderId}/payment-intent`, {
         method: "POST",
         credentials: "include",
       });
@@ -50,16 +55,14 @@ function CheckoutForm({ cartId, total }) {
       if (stripeError) throw new Error(stripeError.message);
 
       if (paymentIntent.status === "succeeded") {
-        const orderRes = await fetch(`http://localhost:3000/cart/${cartId}/checkout`, {
+        const confirmRes = await fetch(`http://localhost:3000/orders/${orderId}/confirm-payment`, {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" }, 
-          body: JSON.stringify({ paymentIntentId: paymentIntent.id})
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentIntentId: paymentIntent.id }),
         });
-        const orderData = await orderRes.json();
-        if (!orderRes.ok) throw new Error(orderData?.message || "Failed to place order");
-
-        localStorage.removeItem("activeCartId");
+        const confirmData = await confirmRes.json();
+        if (!confirmRes.ok) throw new Error(confirmData?.message || "Failed to confirm payment");
         navigate("/orders");
       }
     } catch (err) {
@@ -77,7 +80,6 @@ function CheckoutForm({ cartId, total }) {
           <CardNumberElement options={stripeInputStyle} />
         </div>
       </div>
-
       <div className="checkout-field-row">
         <div className="checkout-field-group">
           <label className="checkout-label">Expiry Date</label>
@@ -85,7 +87,6 @@ function CheckoutForm({ cartId, total }) {
             <CardExpiryElement options={stripeInputStyle} />
           </div>
         </div>
-
         <div className="checkout-field-group">
           <label className="checkout-label">CVC</label>
           <div className="checkout-stripe-input">
@@ -93,9 +94,7 @@ function CheckoutForm({ cartId, total }) {
           </div>
         </div>
       </div>
-
       {error && <p className="checkout-error">{error}</p>}
-
       <button className="checkout-pay-btn" type="submit" disabled={!stripe || processing}>
         {processing ? "Processing..." : `Pay $${Number(total).toFixed(2)}`}
       </button>
@@ -103,61 +102,49 @@ function CheckoutForm({ cartId, total }) {
   );
 }
 
-function CheckoutPage() {
+function OrderPayPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [total, setTotal] = useState("0.00");
-  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const cartId = localStorage.getItem("activeCartId");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!cartId) { navigate("/cart"); return; }
-
-    const loadCart = async () => {
+    const loadOrder = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/cart/${cartId}`, {
+        const res = await fetch(`http://localhost:3000/orders/${id}`, {
           credentials: "include",
         });
         if (res.status === 401) { navigate("/login"); return; }
         const data = await res.json();
-        if (!res.ok || !data?.data?.items?.length) { navigate("/cart"); return; }
-        setItems(data.data.items);
-        setTotal(data.data.total);
+        if (!res.ok) throw new Error(data?.message || "Order not found");
+        const order = data?.data?.order;
+        if (order.status !== "pending") { navigate("/orders"); return; }
+        setTotal(order.total);
+      } catch (err) {
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    loadCart();
-  }, [cartId, navigate]);
+    loadOrder();
+  }, [id, navigate]);
 
   if (loading) return <p className="checkout-feedback">Loading...</p>;
+  if (error) return <p className="checkout-feedback">{error}</p>;
 
   return (
     <section className="checkout-page">
-      <h1>Checkout</h1>
-
+      <h1>Pay for Order #{id}</h1>
       <div className="checkout-layout">
         <div className="checkout-summary">
-          <h2>Order Summary</h2>
-          <ul className="checkout-items">
-            {items.map((item) => (
-              <li key={item.cart_item_id} className="checkout-item-row">
-                <span className="checkout-item-name">{item.product_name}</span>
-                <span className="checkout-item-meta">{item.qty} × ${Number(item.price).toFixed(2)}</span>
-                <span className="checkout-item-subtotal">${Number(item.subtotal).toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="checkout-total-row">
-            <span>Total</span>
-            <span>${Number(total).toFixed(2)}</span>
-          </div>
+          <h2>Order Total</h2>
+          <p className="checkout-total">Total: <strong>${Number(total).toFixed(2)}</strong></p>
         </div>
-
         <div className="checkout-payment">
-          <h2>Payment</h2>
+          <h2>Payment Details</h2>
           <Elements stripe={stripePromise}>
-            <CheckoutForm cartId={cartId} total={total} />
+            <OrderPayForm orderId={id} total={total} />
           </Elements>
         </div>
       </div>
@@ -165,4 +152,4 @@ function CheckoutPage() {
   );
 }
 
-export default CheckoutPage;
+export default OrderPayPage;

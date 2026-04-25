@@ -14,7 +14,7 @@ import CartPage from './components/CartPage';
 import OrdersPage from './components/OrdersPage';
 import ProfilePage from './components/ProfilePage';
 import CheckoutPage from './components/CheckoutPage';
-
+import OrderPayPage from './components/OrderPayPage';
 
 
 function App() {
@@ -64,6 +64,7 @@ function App() {
         <Route path='/cart' element={<CartPage />} />
         <Route path='/orders' element={<OrdersPage />} />
         <Route path='/checkout' element={<CheckoutPage />} />
+        <Route path='/orders/:id/pay' element={<OrderPayPage />} />
         {/* Catch all route for bad URLs */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>

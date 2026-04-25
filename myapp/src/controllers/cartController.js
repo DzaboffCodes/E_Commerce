@@ -226,14 +226,19 @@ const checkoutCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { cartId } = req.params;
+    const { paymentIntentId } = req.body;
+
+    if (!paymentIntentId) {
+      return errorResponse(res, "Payment is required", 400, "PAYMENT_REQUIRED");
+    }
 
     // Fetch cart items and verify ownership
     const cartItems = await db.query(
       `SELECT ci.qty, p.price, ci.productid, p.name, p.description
-                FROM cart_items ci
-                JOIN cart c ON ci.cartid = c.id
-                JOIN products p ON ci.productid = p.id
-                WHERE c.id = $1 AND c.userid = $2`,
+       FROM cart_items ci
+       JOIN cart c ON ci.cartid = c.id
+       JOIN products p ON ci.productid = p.id
+       WHERE c.id = $1 AND c.userid = $2`,
       [cartId, userId],
     );
 
@@ -246,20 +251,40 @@ const checkoutCart = async (req, res) => {
       );
     }
 
-    // Calculate total price
     const totalPrice = cartItems.rows.reduce(
-      (total, item) => total + item.qty * item.price,
+      (total, item) => total + item.qty * Number(item.price),
       0,
     );
+    const totalCents = Math.round(totalPrice * 100);
 
-    // Create new order
+    // Verify Stripe payment
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (!paymentIntent || paymentIntent.status !== "succeeded") {
+      return errorResponse(
+        res,
+        "Payment not completed",
+        400,
+        "PAYMENT_NOT_COMPLETED",
+      );
+    }
+
+    if (paymentIntent.amount !== totalCents) {
+      return errorResponse(
+        res,
+        "Payment amount mismatch",
+        400,
+        "PAYMENT_AMOUNT_MISMATCH",
+      );
+    }
+
+    // Create successful order after payment verification
     const newOrder = await db.query(
       "INSERT INTO orders (userid, total, status) VALUES ($1, $2, $3) RETURNING *",
-      [userId, totalPrice, "pending"],
+      [userId, totalPrice, "successful"],
     );
     const orderId = newOrder.rows[0].id;
 
-    // Insert order items
     for (const item of cartItems.rows) {
       await db.query(
         "INSERT INTO order_items (orderid, productid, qty, price, name, description) VALUES ($1, $2, $3, $4, $5, $6)",
@@ -274,14 +299,11 @@ const checkoutCart = async (req, res) => {
       );
     }
 
-    // Clear the cart
     await db.query("DELETE FROM cart_items WHERE cartid = $1", [cartId]);
 
     successResponse(
       res,
-      {
-        order: newOrder.rows[0],
-      },
+      { order: newOrder.rows[0] },
       "Order created successfully",
       201,
     );
