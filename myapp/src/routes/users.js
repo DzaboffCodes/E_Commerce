@@ -65,7 +65,7 @@ const userController = require('../controllers/userController');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', validateId, userController.getUserById);
+router.get('/:id', validateId, isAuthenticated, userController.getUserById);
 
 /**
  * @swagger
