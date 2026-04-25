@@ -132,24 +132,25 @@ function OrdersPage() {
                           </li>
                         ))}
                       </ul>
-                      {CANCELLABLE.includes(order.status) && (
-                        <button
-                          className="order-cancel-btn"
-                          onClick={() => handleCancel(order.id)}
-                          disabled={cancellingId === order.id}
-                        >
-                          {cancellingId === order.id ? "Cancelling..." : "Cancel Order"}
-                        </button>
-                      )}
-
-                      {order.status === "pending" && (
-                        <button
-                          className="order-pay-btn"
-                          onClick={() => navigate(`/orders/${order.id}/pay`)}
-                        >
-                          Pay Now
-                        </button>
-                      )}
+                      <div className="order-actions">
+                        {CANCELLABLE.includes(order.status) && (
+                          <button
+                            className="order-cancel-btn"
+                            onClick={() => handleCancel(order.id)}
+                            disabled={cancellingId === order.id}
+                          >
+                            {cancellingId === order.id ? "Cancelling..." : "Cancel Order"}
+                          </button>
+                        )}
+                        {order.status === "pending" && (
+                          <button
+                            className="order-pay-btn"
+                            onClick={() => navigate(`/orders/${order.id}/pay`)}
+                          >
+                            Pay Now
+                          </button>
+                        )}
+                      </div>
                     </>
                   ) : (
                     <p className="order-items-loading">No items found.</p>
