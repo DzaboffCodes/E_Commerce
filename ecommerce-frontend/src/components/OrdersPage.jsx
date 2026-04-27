@@ -19,7 +19,7 @@ function OrdersPage() {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("`${import.meta.env.VITE_API_URL}`/orders", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
           credentials: "include",
         });
         if (response.status === 401) { navigate("/login"); return; }
