@@ -12,7 +12,7 @@ function ProductsPage({ user }) {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/products?limit=1000');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/products?limit=1000`);
         const data = await response.json();
         if (!response.ok) {
           throw new Error("Unable to retrieve products (server error). Please try again.");

@@ -19,7 +19,7 @@ function OrdersPage() {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("http://localhost:3000/orders", {
+        const response = await fetch("`${import.meta.env.VITE_API_URL}`/orders", {
           credentials: "include",
         });
         if (response.status === 401) { navigate("/login"); return; }
@@ -45,7 +45,7 @@ function OrdersPage() {
 
     setItemsLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/orders/${orderId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/${orderId}`, {
         credentials: "include",
       });
       const data = await res.json();
@@ -61,7 +61,7 @@ function OrdersPage() {
     if (!window.confirm("Cancel this order?")) return;
     setCancellingId(orderId);
     try {
-      const res = await fetch(`http://localhost:3000/orders/${orderId}/cancel`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/cancel`, {
         method: "POST",
         credentials: "include",
       });

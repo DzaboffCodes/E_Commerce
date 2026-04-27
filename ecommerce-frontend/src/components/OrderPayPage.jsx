@@ -39,7 +39,7 @@ function OrderPayForm({ orderId, total }) {
     setError("");
 
     try {
-      const intentRes = await fetch(`http://localhost:3000/orders/${orderId}/payment-intent`, {
+      const intentRes = await fetch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/payment-intent`, {
         method: "POST",
         credentials: "include",
       });
@@ -55,7 +55,7 @@ function OrderPayForm({ orderId, total }) {
       if (stripeError) throw new Error(stripeError.message);
 
       if (paymentIntent.status === "succeeded") {
-        const confirmRes = await fetch(`http://localhost:3000/orders/${orderId}/confirm-payment`, {
+        const confirmRes = await fetch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/confirm-payment`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -112,7 +112,7 @@ function OrderPayPage() {
   useEffect(() => {
     const loadOrder = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/orders/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/${id}`, {
           credentials: "include",
         });
         if (res.status === 401) { navigate("/login"); return; }

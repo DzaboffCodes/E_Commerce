@@ -34,7 +34,7 @@ function CheckoutForm({ cartId, total }) {
     setError("");
 
     try {
-      const intentRes = await fetch(`http://localhost:3000/cart/${cartId}/payment-intent`, {
+      const intentRes = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}/payment-intent`, {
         method: "POST",
         credentials: "include",
       });
@@ -50,7 +50,7 @@ function CheckoutForm({ cartId, total }) {
       if (stripeError) throw new Error(stripeError.message);
 
       if (paymentIntent.status === "succeeded") {
-        const orderRes = await fetch(`http://localhost:3000/cart/${cartId}/checkout`, {
+        const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}/checkout`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" }, 
@@ -115,7 +115,7 @@ function CheckoutPage() {
 
     const loadCart = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/cart/${cartId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}`, {
           credentials: "include",
         });
         if (res.status === 401) { navigate("/login"); return; }

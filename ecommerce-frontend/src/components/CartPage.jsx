@@ -26,7 +26,7 @@ function CartPage() {
                 return;
             }
 
-            const response = await fetch(`http://localhost:3000/cart/${cartId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -72,7 +72,7 @@ function CartPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/cart/${cartId}/items/${itemId}`,
+                `${import.meta.env.VITE_API_URL}/cart/${cartId}/items/${itemId}`,
                 {
                     method: "DELETE",
                     credentials: "include",
@@ -106,7 +106,7 @@ function CartPage() {
         setError("");
 
         try {
-            const response = await fetch(`http://localhost:3000/cart/${cartId}/items`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}/items`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -141,7 +141,7 @@ function CartPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/cart/${cartId}/items/${item.cart_item_id}`,
+                `${import.meta.env.VITE_API_URL}/cart/${cartId}/items/${item.cart_item_id}`,
                 {
                     method: "DELETE",
                     credentials: "include",

@@ -28,6 +28,9 @@ const PORT = process.env.PORT || 3000;
 // Apply security middleware
 setupSecurity(app);
 
+// Trust Render's proxy so secure cookies work
+app.set('trust proxy', 1);
+
 // Session middleware
 app.use(
   session({
@@ -36,8 +39,9 @@ app.use(
     saveUninitialized: false,
     // No store specified = defaults to MemoryStore
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV==="production",
       httpOnly: true,
+      sameSite: process.env.NODE_ENV==="production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   }),

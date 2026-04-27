@@ -15,7 +15,7 @@ function ProfilePage({ user, setUser }) {
 
     const loadProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/users/${user.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/users/${user.id}`, {
           credentials: "include",
         });
         const data = await res.json();
@@ -41,7 +41,7 @@ function ProfilePage({ user, setUser }) {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch(`http://localhost:3000/users/${user.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/users/${user.id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

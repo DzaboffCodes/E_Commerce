@@ -33,7 +33,7 @@ function ProductDetailsPage({ user }) {
 
             // Create cart once (or reuse existing)
             if (!cartId) {
-                const cartResponse = await fetch("http://localhost:3000/cart", {
+                const cartResponse = await fetch(`${import.meta.env.VITE_API_URL}/cart`, {
                     method: "POST",
                     credentials: "include"
                 });
@@ -47,7 +47,7 @@ function ProductDetailsPage({ user }) {
                 localStorage.setItem("activeCartId", String(cartId))
             }
 
-            const addResponse = await fetch(`http://localhost:3000/cart/${cartId}/items`, {
+            const addResponse = await fetch(`${import.meta.env.VITE_API_URL}/cart/${cartId}/items`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -76,7 +76,7 @@ function ProductDetailsPage({ user }) {
     useEffect(() => {
         const loadProduct = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/products/${id}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/products/${id}`, {
                     method: "GET"
                 })
                 const data = await response.json();
