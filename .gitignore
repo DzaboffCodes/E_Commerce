@@ -3,3 +3,4 @@ node_modules/
 
 # Old monolithic file (kept for reference)
 myapp/index.js
+ecommerce_api database
