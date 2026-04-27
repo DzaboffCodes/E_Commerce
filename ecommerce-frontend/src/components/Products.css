@@ -184,3 +184,41 @@
   margin-top: 40px;
   text-align: center;
 }
+
+.products-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.products-page-btn {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #bfd3ea;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f5fa6;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.18s ease, opacity 0.18s ease;
+}
+
+.products-page-btn:hover:not(:disabled) {
+  background: #f4f8fc;
+}
+
+.products-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.products-page-label {
+  min-width: 120px;
+  text-align: center;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
