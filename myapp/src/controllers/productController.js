@@ -2,29 +2,56 @@ const db = require('../config/database');
 const { successResponse, errorResponse } = require('../utils/logger');
 
 // Get all products or filter by category
+// Get all products with filtering + pagination
 const getAllProducts = async (req, res) => {
     try {
-        const { category, limit = 50, offset = 0 } = req.query;
+        const { category, search } = req.query;
 
-        let query = 'SELECT * FROM products';
-        let params = [];
+        const parsedPage = parseInt(req.query.page, 10);
+        const parsedLimit = parseInt(req.query.limit, 10);
+
+        const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+        const limit = Number.isInteger(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 100) : 24;
+        const offset = (page - 1) * limit;
+
+        const filters = [];
+        const filterParams = [];
 
         if (category) {
-            query += ' WHERE category = $1';
-            params.push(category);
+            filterParams.push(category);
+            filters.push('category = $' + filterParams.length);
         }
 
-        query += ' ORDER BY id ASC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
-        params.push(parseInt(limit), parseInt(offset));
+        if (search) {
+            filterParams.push('%' + search + '%');
+            filters.push('name ILIKE $' + filterParams.length);
+        }
 
-        const result = await db.query(query, params);
+        const whereClause = filters.length ? ' WHERE ' + filters.join(' AND ') : '';
+
+        const countQuery = 'SELECT COUNT(*)::int AS total FROM products' + whereClause;
+        const countResult = await db.query(countQuery, filterParams);
+        const total = countResult.rows[0]?.total || 0;
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+
+        const productsQuery =
+            'SELECT * FROM products' +
+            whereClause +
+            ' ORDER BY id ASC LIMIT $' + (filterParams.length + 1) +
+            ' OFFSET $' + (filterParams.length + 2);
+
+        const productsParams = [...filterParams, limit, offset];
+        const productsResult = await db.query(productsQuery, productsParams);
 
         successResponse(res, {
-            products: result.rows,
+            products: productsResult.rows,
             pagination: {
-                limit: parseInt(limit),
-                offset: parseInt(offset),
-                count: result.rows.length
+                page,
+                limit,
+                total,
+                totalPages,
+                hasPrev: page > 1,
+                hasNext: page < totalPages
             }
         }, 'Products retrieved successfully');
 
